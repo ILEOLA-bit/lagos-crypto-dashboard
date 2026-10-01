@@ -1,34 +1,55 @@
 import streamlit as st
-import csv
+import pandas as pd
 
-st.set_page_config(page_title="Lagos Crypto Dashboard")
-st.title("Lagos Crypto Dashboard - Built from Lagos!")
-st.markdown("Real Bitcoin Data | 1 Year Trend")
+st.set_page_config(page_title="Lagos Crypto Dashboard", page_icon="🇳🇬", layout="wide")
 
-rows = []
-with open("real_bitcoin_1year.csv", "r") as f:
-    reader = csv.reader(f)
-    header = next(reader)
-    for row in reader:
-        rows.append(row)
-
-st.success(f"Loaded {len(rows)} days of Bitcoin data")
-
-first_price = float(rows[0][1])
-last_price = float(rows[-1][1])
-growth = last_price / first_price * 500
-pct = (last_price/first_price-1)*100
-
-st.markdown(f"**Columns:** {header[0]}, {header[1]}")
-st.markdown(f"**First day:** {rows[0][0]} - ${first_price}")
-st.markdown(f"**Last day:** {rows[-1][0]} - ${last_price}")
-
-st.metric("Your $500 investment would be", f"${growth:.2f}", f"{pct:.1f}%")
-
+st.title("Lagos! 🇳🇬 Bitcoin Dashboard")
+st.markdown("**Real Bitcoin Data | 1 Year Trend | Built from Lagos**")
 st.markdown("---")
-st.markdown("### Last 5 days:")
-for r in rows[-5:]:
-    st.markdown(f"- {r[0]} : ${r[1]}")
 
-st.markdown("---")
-st.markdown("Built by a Lagos Data Analyst | 2026")
+# Load data
+try:
+    df = pd.read_csv("real_bitcoin_1year.csv")
+    df['Date'] = pd.to_datetime(df['Date'])
+    df = df.sort_values('Date')
+
+    st.success(f"Loaded {len(df)} days of Bitcoin data")
+
+    # Metrics
+    col1, col2, col3 = st.columns(3)
+    first_price = df['Price'].iloc[0]
+    last_price = df['Price'].iloc[-1]
+    growth = ((last_price - first_price) / first_price) * 100
+
+    initial_investment = 500
+    final_value = initial_investment * (last_price / first_price)
+
+    with col1:
+        st.metric("First Price", f"${first_price:,.2f}", f"{df['Date'].iloc[0].date()}")
+    with col2:
+        st.metric("Last Price", f"${last_price:,.2f}", f"{df['Date'].iloc[-1].date()}")
+    with col3:
+        st.metric("Growth", f"{growth:.2f}%", f"${final_value:.2f} from $500")
+
+    st.markdown("### Your $500 Investment Would Be:")
+    st.markdown(f"# ${final_value:,.2f}")
+    if growth > 0:
+        st.markdown(f"<h3 style='color:green'>+{growth:.2f}% 🚀</h3>", unsafe_allow_html=True)
+    else:
+        st.markdown(f"<h3 style='color:red'>{growth:.2f}% 📉</h3>", unsafe_allow_html=True)
+
+    # CHART
+    st.markdown("---")
+    st.subheader("📈 Bitcoin Price - Last 1 Year")
+    st.line_chart(df.set_index('Date')['Price'], height=400)
+
+    # Data table
+    with st.expander("See raw data"):
+        st.dataframe(df.tail(20), use_container_width=True)
+
+    st.markdown("---")
+    st.markdown("Built with ❤️ in Lagos, Nigeria | ILEOLA-bit")
+
+except Exception as e:
+    st.error(f"Error: {e}")
+    st.info("Make sure real_bitcoin_1year.csv is uploaded")
