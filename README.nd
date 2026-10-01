@@ -1,12 +1,4 @@
 # Lagos Crypto Dashboard 🇳🇬
 Live: https://lagos-crypto-dashboard-7jrungadve4tmj6kukwermm.streamlit.app
 
-Real-time Bitcoin analytics built from Lagos, Nigeria.
-
-**Tech:** Python, Pandas, Streamlit
-**Features:**
-- 1 Year BTC trend
-- Investment simulator ($500 → $436)
-- Interactive chart
-
-Built by ILEOLA-bit - Lagos to the World 🚀
+Real Bitcoin Data - Built from Lagos with Python
